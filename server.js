@@ -33,7 +33,7 @@ var Reviews = mongoose.model('hotelreviews', {
 
 // get all reviews
 app.get('/', function (req, res) {
-    console.log('GET');
+    console.log('GET request reviews');
     Reviews.find(function (err, reviews) {
         if (err)
             res.send(err)
