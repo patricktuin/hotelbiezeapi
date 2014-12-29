@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-
+var nodemailer = require('nodemailer');
 
 // connect to mongodb
 mongoose.connect('mongodb://localhost/hotelbieze-dev');
@@ -33,6 +33,7 @@ var Reviews = mongoose.model('hotelreviews', {
 
 // get all reviews
 app.get('/', function (req, res) {
+    console.log('GET');
     Reviews.find(function (err, reviews) {
         if (err)
             res.send(err)
@@ -41,18 +42,17 @@ app.get('/', function (req, res) {
     });
 });
 
-  // Find one review
-  app.get('/:review_id', function(req, res) {
-      Reviews.find({
-        _id : req.params.review_id
-      },
-        function(err, review) {
-        if (err)
-          res.send(err)
-        res.json(review);
-    });
-  });
-
+// Find one review
+app.get('/:review_id', function (req, res) {
+    Reviews.find({
+            _id: req.params.review_id
+        },
+        function (err, review) {
+            if (err)
+                res.send(err)
+            res.json(review);
+        });
+});
 
 
 // post new review
@@ -78,32 +78,67 @@ app.delete('/:review_id', function (req, res) {
         if (err)
             res.send(err);
 
-        
-            Reviews.find(function (err, reviews) {
-        if (err)
-            res.send(err)
-        res.json(reviews);
 
+        Reviews.find(function (err, reviews) {
+            if (err)
+                res.send(err)
+            res.json(reviews);
+
+        });
     });
 });
-});
 
-  // delete a guest
-  app.delete('/api/wedding/:guest_id', function(req, res) {
+// delete a guest
+app.delete('/api/wedding/:guest_id', function (req, res) {
     Guests.remove({
-      _id : req.params.guest_id
-    }, function(err, guest) {
-      if (err)
-        res.send(err);
-
-      // get and return all the guests after you create another
-      Guests.find(function(err, guests) {
+        _id: req.params.guest_id
+    }, function (err, guest) {
         if (err)
-          res.send(err)
-        res.json(guests);
-      });
+            res.send(err);
+
+        // get and return all the guests after you create another
+        Guests.find(function (err, guests) {
+            if (err)
+                res.send(err)
+            res.json(guests);
+        });
     });
-  });
+});
+
+
+app.post('/sendmail', function (req, res) {
+    console.log('POST' + JSON.stringify(req.body))
+// create reusable transporter object using SMTP transport
+    var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: 'patricktuin78@gmail.com',
+            pass: 'vriendin17'
+        }
+    });
+
+// NB! No need to recreate the transporter object. You can use
+// the same transporter object for all e-mails
+
+// setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: req.body.name + '<' + req.body.address + '>', // sender address
+        to: 'patricktuin78@gmail.com', // list of receivers
+        subject: req.body.subject, // Subject line
+        text: req.body.body // plaintext body
+        //html: '<b>Hello world ✔</b>' // html body
+    };
+
+// send mail with defined transport object
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Message sent: ' + info.response);
+        }
+    });
+
+});
 
 // create webserver
 var server = app.listen(3000, function () {
