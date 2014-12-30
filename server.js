@@ -33,7 +33,7 @@ var Reviews = mongoose.model('hotelreviews', {
 
 // get all reviews
 app.get('/', function (req, res) {
-    console.log('GET request reviews');
+    console.log('GET reviews');
     Reviews.find(function (err, reviews) {
         if (err)
             res.send(err)
@@ -57,7 +57,7 @@ app.get('/:review_id', function (req, res) {
 
 // post new review
 app.post('/', function (req, res) {
-    console.log('POST' + JSON.stringify(req.body))
+    console.log('POST' + ' ' +JSON.stringify(req.body))
     Reviews.create({
         stars: req.body.stars,
         body: req.body.body,
@@ -72,19 +72,12 @@ app.post('/', function (req, res) {
 
 // delete review
 app.delete('/:review_id', function (req, res) {
+    console.log('Delete' + ' ' +  req.params.review_id)
     Reviews.remove({
         _id: req.params.review_id
     }, function (err, review) {
         if (err)
             res.send(err);
-
-
-        Reviews.find(function (err, reviews) {
-            if (err)
-                res.send(err)
-            res.json(reviews);
-
-        });
     });
 });
 
