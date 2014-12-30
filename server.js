@@ -81,23 +81,6 @@ app.delete('/:review_id', function (req, res) {
     });
 });
 
-// delete a guest
-app.delete('/api/wedding/:guest_id', function (req, res) {
-    Guests.remove({
-        _id: req.params.guest_id
-    }, function (err, guest) {
-        if (err)
-            res.send(err);
-
-        // get and return all the guests after you create another
-        Guests.find(function (err, guests) {
-            if (err)
-                res.send(err)
-            res.json(guests);
-        });
-    });
-});
-
 
 app.post('/sendmail', function (req, res) {
     console.log('POST' + JSON.stringify(req.body))
